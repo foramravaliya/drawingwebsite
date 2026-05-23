@@ -1,0 +1,124 @@
+.gallery-header {
+  text-align: center;
+  padding: 45px 20px 25px;
+}
+
+.gallery-header h1 {
+  font-size: 42px;
+  color: #7b5ea7;
+}
+
+.gallery-header p {
+  color: #777;
+  font-weight: 700;
+  margin: 8px 0 18px;
+}
+
+.gallery-header button {
+  border: none;
+  background: #ff7bac;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 24px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.empty-gallery {
+  text-align: center;
+  padding: 70px 20px;
+  color: #777;
+}
+
+.empty-gallery div {
+  font-size: 70px;
+}
+
+.empty-gallery h2 {
+  color: #7b5ea7;
+  margin: 15px 0;
+}
+
+.gallery-grid {
+  padding: 25px 36px 55px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 22px;
+}
+
+.gallery-card {
+  background: white;
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+  transition: 0.2s;
+}
+
+.gallery-card:hover {
+  transform: translateY(-5px);
+}
+
+.gallery-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  background: white;
+}
+
+.gallery-info {
+  padding: 14px 18px;
+}
+
+.gallery-info h3 {
+  color: #7b5ea7;
+}
+
+.gallery-info p {
+  color: #999;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+body {
+  background:
+    radial-gradient(circle at top left, #ffe5ec 0%, transparent 20%),
+    radial-gradient(circle at bottom right, #caf0f8 0%, transparent 20%),
+    #fffaf5;
+}
+
+.page-decoration {
+  position: fixed;
+  font-size: 30px;
+  opacity: 0.18;
+  z-index: 0;
+  animation: floaty 6s ease-in-out infinite;
+}
+
+.star1 {
+  top: 120px;
+  left: 40px;
+}
+
+.star2 {
+  top: 300px;
+  right: 50px;
+}
+
+.star3 {
+  bottom: 80px;
+  left: 45%;
+}
+
+@keyframes floaty {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-14px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}

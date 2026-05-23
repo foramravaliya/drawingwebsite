@@ -1,0 +1,205 @@
+.coloring-header {
+  text-align: center;
+  padding: 40px 20px 20px;
+}
+
+.coloring-header h1 {
+  color: #7b5ea7;
+  font-size: 42px;
+}
+
+.coloring-header p {
+  color: #777;
+  font-weight: 700;
+  margin-top: 8px;
+}
+
+.coloring-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 22px;
+  padding: 20px 36px 50px;
+}
+
+.coloring-card {
+  background: white;
+  border: 3px solid transparent;
+  border-radius: 24px;
+  padding: 22px;
+  cursor: pointer;
+  box-shadow: 0 5px 18px rgba(0,0,0,0.08);
+  transition: 0.2s;
+}
+
+.coloring-card:hover {
+  transform: translateY(-5px);
+  border-color: #ff7bac;
+}
+
+.coloring-card img {
+  width: 140px;
+  height: 120px;
+  object-fit: contain;
+}
+
+.coloring-card h3 {
+  margin-top: 12px;
+  color: #3d2b5c;
+}
+
+.coloring-work-header {
+  background: white;
+  border-bottom: 3px solid #ede0ff;
+  height: 76px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 0 28px;
+}
+
+.coloring-work-header button {
+  background: #ede0ff;
+  color: #7b5ea7;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.coloring-work-header h1 {
+  color: #7b5ea7;
+}
+
+.coloring-workspace {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-height: calc(100vh - 156px);
+}
+
+.coloring-palette {
+  background: white;
+  border-right: 3px solid #ede0ff;
+  padding: 22px;
+}
+
+.coloring-palette h3 {
+  color: #7b5ea7;
+  margin-bottom: 15px;
+}
+
+.active-color-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff5ec;
+  padding: 12px;
+  border-radius: 16px;
+  margin-bottom: 16px;
+}
+
+.active-color-box span {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 4px solid white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+}
+
+.active-color-box p {
+  color: #777;
+  font-weight: 900;
+}
+
+.coloring-colors {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.coloring-colors button {
+  aspect-ratio: 1;
+  border-radius: 10px;
+  border: 3px solid #eee;
+  cursor: pointer;
+}
+
+.reset-btn,
+.save-coloring-btn {
+  width: 100%;
+  margin-top: 16px;
+  padding: 13px;
+  border-radius: 20px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.reset-btn {
+  background: white;
+  border: 3px solid #7b5ea7;
+  color: #7b5ea7;
+}
+
+.save-coloring-btn {
+  background: #6bcb77;
+  border: none;
+  color: white;
+}
+
+.coloring-canvas-area {
+  background: #f8f8f8;
+  display: flex;
+  justify-content: center;
+  padding: 30px;
+}
+
+.coloring-canvas {
+  background: white;
+  border-radius: 18px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+  cursor: crosshair;
+}
+
+body {
+  background:
+    radial-gradient(circle at top right, #ffd6e7 0%, transparent 20%),
+    radial-gradient(circle at bottom left, #d8f3dc 0%, transparent 20%),
+    #fff8f0;
+}
+
+.page-decoration {
+  position: fixed;
+  font-size: 30px;
+  opacity: 0.18;
+  z-index: 0;
+  animation: floaty 6s ease-in-out infinite;
+}
+
+.star1 {
+  top: 120px;
+  left: 40px;
+}
+
+.star2 {
+  top: 300px;
+  right: 50px;
+}
+
+.star3 {
+  bottom: 80px;
+  left: 45%;
+}
+
+@keyframes floaty {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-14px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
