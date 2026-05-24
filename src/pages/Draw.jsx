@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import Navbar from "../components/Navbar";
 import "../styles/draw.css";
+import { stickerCategories } from "../data/stickers";
 
 export default function Draw() {
   const canvasRef = useRef(null);
@@ -17,15 +18,28 @@ export default function Draw() {
   const [snapshot, setSnapshot] = useState(null);
   const [selectedSticker, setSelectedSticker] = useState(null);
 const [rainbowMode, setRainbowMode] = useState(false);
-const [cursorSparkle, setCursorSparkle] = useState(null);
+const [sparkles, setSparkles] = useState([]);
+const [activeStickerCategory, setActiveStickerCategory] = useState("Favorites");
+const [placedStickers, setPlacedStickers] = useState([]);
+const [draggingSticker, setDraggingSticker] = useState(null);
+const [selectedPlacedSticker, setSelectedPlacedSticker] = useState(null);
 
+const playSound = (src) => {
+  const audio = new Audio(src);
+  audio.volume = 0.4;
+  audio.play();
+};
 
   const colors = [
-    "#ff7bac", "#ff5a99", "#ff6b6b", "#ff9a3c",
-    "#ffd93d", "#ffec5c", "#6bcb77", "#4caf50",
-    "#4d96ff", "#7b5ea7", "#b39ddb", "#ff80ab",
-    "#00bcd4", "#26c6da", "#78909c", "#ffffff",
-    "#3d2b5c", "#4e342e", "#000000", "#ff8a65"
+    "#000000", "#ffffff", "#808080", "#c0c0c0", "#ff0000", "#800000",
+    "#ff4d4d", "#ff9999", "#ff7f00", "#ffa500", "#ffd580", "#cc5500",
+    "#ffff00", "#fff176", "#fdd835", "#b8860b", "#008000", "#00a000",
+    "#32cd32", "#90ee90", "#006400", "#228b22", "#2e8b57", "#9acd32",
+    "#0000ff", "#1e90ff", "#87ceeb", "#000080", "#4d96ff", "#00bcd4",
+    "#40e0d0", "#008b8b", "#800080", "#7b5ea7", "#b39ddb", "#da70d6",
+    "#ff00ff", "#ff7bac", "#ff5a99", "#ffc0cb", "#8b4513", "#a0522d",
+    "#d2691e", "#cd853f", "#deb887", "#f4a460", "#c19a6b", "#5c4033",
+    "#f5deb3", "#ffe4c4", "#ffdab9", "#f8f8f8"
   ];
 
   const getPosition = (e) => {
@@ -124,15 +138,20 @@ const hexToRgb = (hex) => {
 
 const clearCanvas = () => {
   const confirmClear = window.confirm("Clear the canvas?");
-
   if (!confirmClear) return;
 
+  playSound("/sounds/erase.mp3");
   saveState();
 
   const canvas = canvasRef.current;
   const ctx = canvas.getContext("2d");
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  setPlacedStickers([]);
+  setSelectedPlacedSticker(null);
+  setSelectedSticker(null);
+  setSparkles([]);
 };
 
 const applyBackground = (color) => {
@@ -192,16 +211,27 @@ if (activeTool === "bucket") {
 //draw
 const draw = (e) => {
   if (!isDrawing) return;
-
+if (draggingSticker) {
+  dragSticker(e);
+  return;
+}
 
   const canvas = canvasRef.current;
   const ctx = canvas.getContext("2d");
   const { x, y } = getPosition(e);
-  setCursorSparkle({
-    x,
-    y,
-    id: Date.now()
-  });
+setSparkles((prev) => {
+  const updated = [
+    ...prev.slice(-12),
+    {
+      x,
+      y,
+      id: Date.now() + Math.random(),
+      emoji: rainbowMode ? "🌈" : "✨",
+    },
+  ];
+
+  return updated;
+});
 
   ctx.lineWidth = brushSize;
   ctx.lineCap = "round";
@@ -379,21 +409,54 @@ const draw = (e) => {
   };
 
   const addSticker = (emoji) => {
-    setSelectedSticker(emoji);
+        setSelectedSticker(emoji);
   };
 
 const placeSticker = (e) => {
-  if (!selectedSticker) return;
+   if (!selectedSticker) return;
 
-  saveState();
+   const { x, y } = getPosition(e);
 
-  const canvas = canvasRef.current;
-  const ctx = canvas.getContext("2d");
+   const ctx = canvasRef.current.getContext("2d");
+
+   ctx.font = `${brushSize * 3}px Arial`;
+   ctx.fillText(selectedSticker, x, y);
+
+   playSound("/sounds/pop.mp3");
+
+   setPlacedStickers((prev) => [
+     ...prev,
+     {
+       id: Date.now(),
+       emoji: selectedSticker,
+       x,
+       y,
+       size: brushSize * 3,
+       rotation: 0,
+     },
+   ]);
+ };
+
+const startStickerDrag = (id) => {
+  setDraggingSticker(id);
+};
+
+const dragSticker = (e) => {
+  if (!draggingSticker) return;
 
   const { x, y } = getPosition(e);
 
-  ctx.font = `${brushSize * 3}px Arial`;
-  ctx.fillText(selectedSticker, x - 20, y + 20);
+  setPlacedStickers((prev) =>
+    prev.map((sticker) =>
+      sticker.id === draggingSticker
+        ? { ...sticker, x, y }
+        : sticker
+    )
+  );
+};
+
+const stopStickerDrag = () => {
+  setDraggingSticker(null);
 };
 
   const saveDrawing = () => {
@@ -411,173 +474,194 @@ const placeSticker = (e) => {
     });
 
     localStorage.setItem("little_artist_gallery", JSON.stringify(saved.slice(0, 20)));
+    playSound("/sounds/save.mp3");
     alert("Drawing saved! 🎉");
   };
 
-  return (
-      <>
-        <Navbar />
+return (
+  <>
+    <Navbar />
 
-        <div className="page-decoration star1">🌈</div>
-        <div className="page-decoration star2">⭐</div>
-        <div className="page-decoration star3">🦄</div>
+    <div className="page-decoration star1">🌈</div>
+    <div className="page-decoration star2">⭐</div>
+    <div className="page-decoration star3">🦄</div>
 
+    <div className="draw-topbar">
+      <button className="back-btn" onClick={() => window.history.back()}>
+        ← Back
+      </button>
 
+      <h1>🎨 Free Draw</h1>
 
-      <div className="draw-topbar">
-        <button className="back-btn" onClick={() => window.history.back()}>
-          ← Back
+      <button
+        className="mobile-tools-btn"
+        onClick={() => document.body.classList.toggle("show-tools")}
+      >
+        🛠 Tools
+      </button>
+
+      <div className="top-actions">
+        <button className="clear-btn" onClick={clearCanvas}>
+          🗑 Clear
         </button>
 
-        <h1>🎨 Free Draw</h1>
-
-        <div className="top-actions">
-          <button className="clear-btn" onClick={clearCanvas}>
-            🗑 Clear
-          </button>
-
-          <button className="save-btn" onClick={saveDrawing}>
-            💾 Save
-          </button>
-        </div>
+        <button className="save-btn" onClick={saveDrawing}>
+          💾 Save
+        </button>
       </div>
+    </div>
 
-      <section className="draw-page magical-bg">
-        <aside className="left-tools">
-          <button
-            className={activeTool === "brush" ? "tool active" : "tool"}
-            onClick={() => setActiveTool("brush")}
-          >
-            🖌 Brush
-          </button>
+    <section className="draw-page magical-bg">
+      <aside className="left-tools">
+        <button
+          className={activeTool === "brush" ? "tool active" : "tool"}
+          onClick={() => setActiveTool("brush")}
+        >
+          🖌 Brush
+        </button>
 
-           <button
-             className={rainbowMode ? "tool active" : "tool"}
-             onClick={() => {
-               setRainbowMode(!rainbowMode);
-               setActiveTool("brush");
-             }}
-           >
-             🌈 Rainbow
-           </button>
-          <button
-            className={activeTool === "eraser" ? "tool active" : "tool"}
-            onClick={() => setActiveTool("eraser")}
-          >
-            🧹 Eraser
-          </button>
+        <button
+          className={rainbowMode ? "tool active" : "tool"}
+          onClick={() => {
+            playSound("/sounds/magic.mp3");
+            setRainbowMode(!rainbowMode);
+            setActiveTool("brush");
+          }}
+        >
+          🌈 Rainbow
+        </button>
 
-<button
-  className={activeTool === "bucket" ? "tool active" : "tool"}
-  onClick={() => setActiveTool("bucket")}
->
-  🪣 Bucket
-</button>
-<button
-  className={activeTool === "line" ? "tool active" : "tool"}
-  onClick={() => setActiveTool("line")}
->
-  📏 Line
-</button>
+        <button
+          className={activeTool === "eraser" ? "tool active" : "tool"}
+          onClick={() => setActiveTool("eraser")}
+        >
+          🧹 Eraser
+        </button>
 
-<button
-  className={activeTool === "rectangle" ? "tool active" : "tool"}
-  onClick={() => setActiveTool("rectangle")}
->
-  ⬜ Rectangle
-</button>
+        <button
+          className={activeTool === "bucket" ? "tool active" : "tool"}
+          onClick={() => setActiveTool("bucket")}
+        >
+          🪣 Bucket
+        </button>
 
-<button
-  className={activeTool === "circle" ? "tool active" : "tool"}
-  onClick={() => setActiveTool("circle")}
->
-  ⭕ Circle
-</button>
-          <button
-            className={activeTool === "text" ? "tool active" : "tool"}
-            onClick={() => setActiveTool("text")}
-          >
-            🔤 Text
-          </button>
+        <button
+          className={activeTool === "line" ? "tool active" : "tool"}
+          onClick={() => setActiveTool("line")}
+        >
+          📏 Line
+        </button>
 
-          <button className="tool" onClick={undoCanvas}>
-            ↩ Undo
-          </button>
+        <button
+          className={activeTool === "rectangle" ? "tool active" : "tool"}
+          onClick={() => setActiveTool("rectangle")}
+        >
+          ⬜ Rectangle
+        </button>
 
-          <button className="tool" onClick={redoCanvas}>
-            ↪ Redo
-          </button>
+        <button
+          className={activeTool === "circle" ? "tool active" : "tool"}
+          onClick={() => setActiveTool("circle")}
+        >
+          ⭕ Circle
+        </button>
 
-          <div className="control-box">
-            <label>
-              Brush Size <span>{brushSize}px</span>
-            </label>
+        <button
+          className={activeTool === "text" ? "tool active" : "tool"}
+          onClick={() => setActiveTool("text")}
+        >
+          🔤 Text
+        </button>
 
-            <input
-              type="range"
-              min="1"
-              max="60"
-              value={brushSize}
-              onChange={(e) => setBrushSize(Number(e.target.value))}
+        <button className="tool" onClick={undoCanvas}>
+          ↩ Undo
+        </button>
+
+        <button className="tool" onClick={redoCanvas}>
+          ↪ Redo
+        </button>
+
+        <div className="control-box">
+          <label>
+            Brush Size <span>{brushSize}px</span>
+          </label>
+
+          <input
+            type="range"
+            min="1"
+            max="60"
+            value={brushSize}
+            onChange={(e) => setBrushSize(Number(e.target.value))}
+          />
+        </div>
+
+        <div className="control-box">
+          <label>
+            Opacity <span>{opacity}%</span>
+          </label>
+
+          <input
+            type="range"
+            min="10"
+            max="100"
+            value={opacity}
+            onChange={(e) => setOpacity(Number(e.target.value))}
+          />
+        </div>
+
+        <h4>COLORS</h4>
+
+        <div className="selected-color">
+          <span style={{ backgroundColor: brushColor }}></span>
+          <p>Selected</p>
+        </div>
+
+        <div className="color-grid">
+          {colors.map((color, index) => (
+            <button
+              key={index}
+              className="color-btn"
+              style={{ backgroundColor: color }}
+              onClick={() => {
+                setBrushColor(color);
+                setActiveTool("brush");
+                setRainbowMode(false);
+              }}
             />
-          </div>
+          ))}
+        </div>
 
-          <div className="control-box">
-            <label>
-              Opacity <span>{opacity}%</span>
-            </label>
+        <input
+          type="color"
+          value={brushColor}
+          onChange={(e) => {
+            setBrushColor(e.target.value);
+            setActiveTool("brush");
+            setRainbowMode(false);
+          }}
+          className="custom-color-picker"
+        />
 
-            <input
-              type="range"
-              min="10"
-              max="100"
-              value={opacity}
-              onChange={(e) => setOpacity(Number(e.target.value))}
-            />
-          </div>
+        <h4>BACKGROUNDS</h4>
 
-          <h4>COLORS</h4>
+        <div className="bg-buttons">
+          <button onClick={() => applyBackground("#ffffff")}>⬜</button>
+          <button onClick={() => applyBackground("#87ceeb")}>☁️</button>
+          <button onClick={() => applyBackground("#90ee90")}>🌿</button>
+          <button onClick={() => applyBackground("#ffb6c1")}>🦄</button>
+          <button onClick={() => applyBackground("#191970")}>🌌</button>
+          <button onClick={() => applyBackground("#ffd166")}>☀️</button>
+        </div>
+      </aside>
 
-          <div className="selected-color">
-            <span style={{ backgroundColor: brushColor }}></span>
-            <p>Selected</p>
-          </div>
+      {selectedSticker && (
+        <div className="selected-sticker-preview">
+          Selected Sticker: {selectedSticker}
+        </div>
+      )}
 
-          <div className="color-grid">
-            {colors.map((color, index) => (
-              <button
-                key={index}
-                className="color-btn"
-                style={{ backgroundColor: color }}
-                onClick={() => {
-                  setBrushColor(color);
-                  setActiveTool("brush");
-                  setRainbowMode(false);
-                }}
-              />
-            ))}
-          </div>
-
-          <h4>BACKGROUNDS</h4>
-
-         <div className="bg-buttons">
-           <button onClick={() => applyBackground("#ffffff")}>⬜</button>
-           <button onClick={() => applyBackground("#87ceeb")}>☁️</button>
-           <button onClick={() => applyBackground("#90ee90")}>🌿</button>
-           <button onClick={() => applyBackground("#ffb6c1")}>🦄</button>
-           <button onClick={() => applyBackground("#191970")}>🌌</button>
-           <button onClick={() => applyBackground("#ffd166")}>☀️</button>
-         </div>
-        </aside>
-
-
-
-{selectedSticker && (
-  <div className="selected-sticker-preview">
-    Selected Sticker: {selectedSticker}
-  </div>
-)}
-        <main className="canvas-area">
+      <main className="canvas-area">
+        <div className="canvas-wrapper">
           <canvas
             ref={canvasRef}
             width="1400"
@@ -593,56 +677,123 @@ const placeSticker = (e) => {
             }}
           ></canvas>
 
-          {cursorSparkle && (
+          {placedStickers.map((sticker) => (
             <div
-              key={cursorSparkle.id}
+              key={sticker.id}
+              className="placed-sticker"
+              style={{
+                left: `${(sticker.x / 1400) * 100}%`,
+                top: `${(sticker.y / 850) * 100}%`,
+                fontSize: `${sticker.size}px`,
+                transform: `translate(-50%, -50%) rotate(${sticker.rotation}deg)`,
+              }}
+              onMouseDown={() => {
+                setSelectedPlacedSticker(sticker.id);
+                startStickerDrag(sticker.id);
+              }}
+              onMouseUp={stopStickerDrag}
+            >
+              {sticker.emoji}
+            </div>
+          ))}
+
+          {sparkles.map((sparkle) => (
+            <div
+              key={sparkle.id}
               className="sparkle"
               style={{
-                left: `${(cursorSparkle.x / 1400) * 100}%`,
-                top: `${(cursorSparkle.y / 850) * 100}%`,
+                left: `${(sparkle.x / 1400) * 100}%`,
+                top: `${(sparkle.y / 850) * 100}%`,
               }}
             >
-              ✨
+              {sparkle.emoji}
             </div>
-          )}
+          ))}
+        </div>
 
+        {selectedPlacedSticker && (
+          <div className="sticker-controls">
+            <button
+              onClick={() => {
+                setPlacedStickers((prev) =>
+                  prev.map((s) =>
+                    s.id === selectedPlacedSticker
+                      ? { ...s, size: s.size + 8 }
+                      : s
+                  )
+                );
+              }}
+            >
+              🔍 Bigger
+            </button>
 
-          <div className="bottom-sticker-panel">
-           <StickerSection title="⭐ Favorites" items={["⭐", "🌟", "✨", "💫", "❤️", "💖", "💜", "💙", "🌈", "☀️", "🌙", "☁️"]} addSticker={addSticker} />
+            <button
+              onClick={() => {
+                setPlacedStickers((prev) =>
+                  prev.map((s) =>
+                    s.id === selectedPlacedSticker
+                      ? { ...s, size: Math.max(20, s.size - 8) }
+                      : s
+                  )
+                );
+              }}
+            >
+              🔎 Smaller
+            </button>
 
-           <StickerSection title="🐾 Animals" items={["🐶", "🐱", "🐭", "🐹", "🐰", "🦊", "🐻", "🐼", "🐨", "🐯", "🦁", "🐮", "🐷", "🐸", "🐵", "🐔", "🐧", "🐢", "🐘", "🦒", "🦄", "🐉"]} addSticker={addSticker} />
+            <button
+              onClick={() => {
+                setPlacedStickers((prev) =>
+                  prev.map((s) =>
+                    s.id === selectedPlacedSticker
+                      ? { ...s, rotation: s.rotation + 20 }
+                      : s
+                  )
+                );
+              }}
+            >
+              🔄 Rotate
+            </button>
 
-           <StickerSection title="🍔 Food" items={["🍕", "🍔", "🍟", "🌭", "🥪", "🌮", "🍩", "🍪", "🍰", "🧁", "🍦", "🍭", "🍬", "🍫", "🍎", "🍓", "🍉", "🍌", "🥭", "🍇", "🍒", "🥕"]} addSticker={addSticker} />
+            <button
+              onClick={() => {
+                setPlacedStickers((prev) =>
+                  prev.filter((s) => s.id !== selectedPlacedSticker)
+                );
+                setSelectedPlacedSticker(null);
+              }}
+            >
+              ❌ Delete
+            </button>
+          </div>
+        )}
 
-           <StickerSection title="🌿 Nature" items={["🌸", "🌺", "🌻", "🌷", "🌹", "🌼", "🌳", "🌴", "🌵", "🍀", "🍁", "🍂", "🌊", "🔥", "❄️", "🌧️", "⛈️", "🌤️"]} addSticker={addSticker} />
-
-           <StickerSection title="🎪 Fun" items={["🎈", "🎁", "🎀", "🎉", "🎊", "🏆", "👑", "💎", "⚽", "🏀", "🎵", "🎸", "🎮", "🚀", "🛸", "🎭", "🎨", "🧸"]} addSticker={addSticker} />
-
-           <StickerSection title="🚗 Vehicles" items={["🚗", "🚕", "🚌", "🚓", "🚑", "🚒", "🚜", "🚲", "🛴", "✈️", "🚁", "🚀", "⛵", "🚢"]} addSticker={addSticker} />
-
-           <StickerSection title="😀 Faces" items={["😀", "😄", "😊", "😍", "😎", "🥳", "🤩", "😇", "🤠", "😋", "🤗", "😜", "😂", "😴", "😮", "😺"]} addSticker={addSticker} />
+        <div className="bottom-sticker-panel">
+          <div className="sticker-tabs">
+            {Object.keys(stickerCategories).map((category) => (
+              <button
+                key={category}
+                className={
+                  activeStickerCategory === category ? "active-sticker-tab" : ""
+                }
+                onClick={() => setActiveStickerCategory(category)}
+              >
+                {category}
+              </button>
+            ))}
           </div>
 
-        </main>
-
-
-      </section>
-    </>
-  );
+          <div className="single-sticker-grid">
+            {stickerCategories[activeStickerCategory].map((item, index) => (
+              <button key={index} onClick={() => addSticker(item)}>
+                {item}
+              </button>
+            ))}
+          </div>
+        </div>
+      </main>
+    </section>
+  </>
+);
 }
 
-function StickerSection({ title, items, addSticker }) {
-  return (
-    <div className="sticker-section">
-      <h3>{title}</h3>
-
-      <div className="sticker-grid">
-        {items.map((item, index) => (
-          <button key={index} onClick={() => addSticker(item)}>
-            {item}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
