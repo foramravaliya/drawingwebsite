@@ -461,21 +461,19 @@ const stopStickerDrag = () => {
 
   const saveDrawing = () => {
     const canvas = canvasRef.current;
-
-    const link = document.createElement("a");
-    link.download = `little-artist-${Date.now()}.png`;
-    link.href = canvas.toDataURL("image/png");
-    link.click();
+    const image = canvas.toDataURL("image/png");
 
     const saved = JSON.parse(localStorage.getItem("little_artist_gallery") || "[]");
+
     saved.unshift({
-      image: canvas.toDataURL("image/png"),
+      image,
       date: new Date().toLocaleDateString(),
     });
 
     localStorage.setItem("little_artist_gallery", JSON.stringify(saved.slice(0, 20)));
+
     playSound("/sounds/save.mp3");
-    alert("Drawing saved! 🎉");
+    alert("Saved to gallery! 🎉");
   };
 
 return (
