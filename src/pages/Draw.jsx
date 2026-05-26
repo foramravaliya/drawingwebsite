@@ -47,8 +47,8 @@ const playSound = (src) => {
     const rect = canvas.getBoundingClientRect();
 
     return {
-      x: (e.nativeEvent.offsetX * canvas.width) / rect.width,
-      y: (e.nativeEvent.offsetY * canvas.height) / rect.height,
+      x: ((e.clientX - rect.left) * canvas.width) / rect.width,
+      y: ((e.clientY - rect.top) * canvas.height) / rect.height,
     };
   };
 
@@ -166,6 +166,7 @@ const applyBackground = (color) => {
 
 /* ************** */
   const startDrawing = (e) => {
+      e.preventDefault();
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     const { x, y } = getPosition(e);
@@ -210,6 +211,7 @@ if (activeTool === "bucket") {
 
 //draw
 const draw = (e) => {
+    e.preventDefault();
   if (!isDrawing) return;
 if (draggingSticker) {
   dragSticker(e);
@@ -312,6 +314,7 @@ setSparkles((prev) => {
 };
 
   const stopDrawing = (e) => {
+      if (e) e.preventDefault();
     if (!isDrawing) {
       setStartPos(null);
       return;
@@ -665,9 +668,10 @@ return (
             width="1400"
             height="850"
             className="main-canvas"
-            onMouseDown={startDrawing}
-            onMouseMove={draw}
-            onMouseUp={(e) => stopDrawing(e)}
+            onPointerDown={startDrawing}
+            onPointerMove={draw}
+            onPointerUp={stopDrawing}
+            onPointerCancel={stopDrawing}
             onMouseLeave={() => {
               setIsDrawing(false);
               setStartPos(null);

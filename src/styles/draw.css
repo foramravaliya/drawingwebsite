@@ -833,3 +833,44 @@ body {
   cursor: pointer;
   background: white;
 }
+.canvas-wrapper {
+  touch-action: none;
+}
+
+.main-canvas {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.canvas-area {
+  overscroll-behavior: contain;
+}
+
+@media (max-width: 900px) {
+  .draw-page {
+    height: calc(100vh - 130px);
+    overflow: hidden;
+  }
+
+  .canvas-area {
+    height: calc(100vh - 130px);
+    overflow: hidden;
+    padding: 10px;
+  }
+
+  .canvas-wrapper {
+    height: 62vh;
+    max-height: 62vh;
+  }
+
+  .main-canvas {
+    height: 62vh;
+    min-height: 62vh;
+  }
+
+  .bottom-sticker-panel {
+    max-height: 220px;
+    overflow-y: auto;
+  }
+}
