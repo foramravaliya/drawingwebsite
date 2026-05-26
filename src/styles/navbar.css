@@ -55,3 +55,21 @@
   background: #ede0ff;
   color: #7b5ea7;
 }
+
+@media (max-width: 900px) {
+  .navbar {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    box-sizing: border-box;
+  }
+
+  .nav-links {
+    flex-wrap: nowrap;
+    gap: 18px;
+  }
+
+  .logo {
+    min-width: 190px;
+  }
+}
