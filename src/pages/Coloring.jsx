@@ -172,8 +172,8 @@ const filteredPictures = pictures.filter((pic) =>
       img.src = pic.image;
 
       img.onload = () => {
-       const maxWidth = 650;
-       const maxHeight = 520;
+       const maxWidth = 720;
+       const maxHeight = 560;
 
        let width = img.width;
        let height = img.height;

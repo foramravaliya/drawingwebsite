@@ -314,3 +314,66 @@ body {
    pointer-events: auto;
  }
 
+@media (max-width: 900px) {
+  .coloring-workspace {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    gap: 14px;
+  }
+
+  .coloring-work-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: white;
+    padding: 12px;
+  }
+
+  .coloring-canvas-area {
+    order: 1;
+    position: sticky;
+    top: 95px;
+    z-index: 80;
+    background: #f8f8f8;
+    padding: 10px;
+  }
+
+  .coloring-canvas {
+    width: 100%;
+    height: 62vh;
+    max-height: 620px;
+    min-height: 520px;
+    display: block;
+  }
+
+  .coloring-palette {
+    order: 2;
+    width: 100%;
+    padding: 14px;
+  }
+
+  .coloring-colors {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 8px;
+    max-height: 220px;
+    overflow-y: auto;
+  }
+
+  .coloring-colors button {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 12px;
+  }
+
+  .active-color-box {
+    padding: 12px;
+  }
+
+  .reset-btn,
+  .save-coloring-btn {
+    width: 100%;
+    margin-top: 10px;
+  }
+}
