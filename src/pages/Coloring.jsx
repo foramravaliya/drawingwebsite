@@ -347,7 +347,13 @@ const filteredPictures = pictures.filter((pic) =>
       <section className="coloring-page">
 
       <div className="coloring-work-header">
-        <button onClick={() => setSelectedPicture(null)}>← Back</button>
+       <button
+         onClick={() => {
+           setSelectedPicture(null);
+         }}
+       >
+         ← Back
+       </button>
         <h1> {selectedPicture.name}</h1>
       </div>
 
