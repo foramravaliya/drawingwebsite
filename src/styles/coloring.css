@@ -217,3 +217,49 @@ body {
   max-width: 900px;
   height: auto;
 }
+
+@media (max-width: 900px) {
+  .coloring-workspace {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 12px;
+    gap: 16px;
+  }
+
+  .coloring-palette {
+    width: 100%;
+    max-width: 100%;
+    order: 2;
+  }
+
+  .coloring-canvas-area {
+    width: 100%;
+    order: 1;
+    padding: 10px;
+  }
+
+  .coloring-canvas {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    min-height: 420px;
+  }
+
+  .coloring-colors {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+  }
+
+  .coloring-colors button {
+    width: 100%;
+    aspect-ratio: 1;
+  }
+
+  .coloring-work-header {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 12px;
+  }
+}

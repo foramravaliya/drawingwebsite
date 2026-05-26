@@ -172,8 +172,8 @@ const filteredPictures = pictures.filter((pic) =>
       img.src = pic.image;
 
       img.onload = () => {
-       const maxWidth = 340;
-       const maxHeight = 340;
+       const maxWidth = 650;
+       const maxHeight = 520;
 
        let width = img.width;
        let height = img.height;
@@ -384,8 +384,8 @@ const filteredPictures = pictures.filter((pic) =>
         <main className="coloring-canvas-area">
           <canvas
             ref={canvasRef}
-            width="520"
-            height="480"
+            width="900"
+            height="720"
             className="coloring-canvas"
             onClick={colorCanvas}
           />
