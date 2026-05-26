@@ -378,7 +378,7 @@ body {
   }
 }
 
-v@media (max-width: 900px) {
+@media (max-width: 900px) {
    html,
    body {
      width: 100%;
